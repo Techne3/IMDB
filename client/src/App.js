@@ -12,6 +12,8 @@ function App() {
     selected: {},
     loading: false,
   });
+  const [nominated, setNominated] = useState([]);
+  const [selectedItem, setSelectedItem] = useState([]);
 
   const search = async (e) => {
     if (e.key === "Enter") {
@@ -32,11 +34,32 @@ function App() {
       return { ...prevState, searchItem: search };
     });
   };
+
+  const addMovies = (id) => {
+    axios(apiURL + "&i=" + id).then(({ data }) => {
+      let result = data;
+      setSelectedItem([...selectedItem, result.imdbID]);
+      setNominated([...nominated, result]);
+    });
+  };
+
+  const removeMovie = (id) => {
+    setSelectedItem(selectedItem.filter((x) => x !== id));
+    setNominated(nominated.filter((x) => x.imdbID !== id));
+  };
+
   return (
     <div className="App">
       <h1>IMDB Movies</h1>
       <SearchMovies handleInput={handleInput} search={search} />
-      <MovieList results={state.results} />
+      <MovieList
+        results={state.results}
+        addMovies={addMovies}
+        setSelectedItem={setSelectedItem}
+        selectedItem={selectedItem}
+        nominated={nominated}
+        removeMovie={removeMovie}
+      />
     </div>
   );
 }
